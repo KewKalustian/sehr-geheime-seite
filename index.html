@@ -813,6 +813,8 @@
         const CONFIG = {
             // Only non-heart emojis for incorrect tiles
             incorrectEmojis: ['🌟', '🌙', '⭐', '🔷', '🔶', '🎵', '💎', '🌸', '🍀', '✨', '🦋', '🌺'],
+            // Sun, star, moon emojis for round 1
+            round1Emojis: ['☀️', '🌞', '⭐', '🌟', '✨', '🌙', '🌛', '🌜', '💫'],
             // Custom photos for correct tiles in round 2
             correctPhotos: [
                 'images/heart1.jpeg',
@@ -908,7 +910,7 @@
 
         function startRound1() {
             currentRound = 1;
-            instructionText.innerText = "Sternen und Monden";
+            instructionText.innerText = "Sonnen, Sternen und Monden";
             setupBoringGrid();
         }
 
@@ -922,7 +924,7 @@
                 const tile = document.createElement('div');
                 tile.className = 'grid-tile';
                 
-                const emoji = CONFIG.incorrectEmojis[i % CONFIG.incorrectEmojis.length];
+                const emoji = CONFIG.round1Emojis[i % CONFIG.round1Emojis.length];
                 tile.innerHTML = `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 3em; background: linear-gradient(135deg, #f0f0f0 0%, #ffffff 100%);">${emoji}</div>`;
                 
                 tile.dataset.index = i;
