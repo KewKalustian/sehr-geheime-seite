@@ -664,24 +664,59 @@
             display: none;
         }
 
-        /* Mobile Optimierung */
+        /* Google Pixel Optimization (1080 x 2340, 6.0" display) */
         @media (max-width: 480px) {
             .valentines-banner {
-                font-size: 1.5em;
-                padding: 15px;
+                font-size: 1.3em;
+                padding: 12px;
+            }
+            
+            .success-screen {
+                padding: 40px 25px;
+                max-width: 95vw;
+            }
+            
+            .success-screen h1 {
+                font-size: 1.6em;
+            }
+            
+            .success-screen .message {
+                font-size: 0.95em;
+            }
+            
+            .emoji-big {
+                font-size: 2.5em;
+            }
+            
+            .captcha-modal {
+                width: 95vw;
+            }
+            
+            .captcha-box {
+                width: 280px;
+            }
+            
+            .modal-header h1 {
+                font-size: 16px;
+            }
+            
+            .modal-header h3 {
+                font-size: 13px;
+            }
+            
+            .modal-header p {
+                font-size: 11px;
+            }
+        }
+
+        /* Extra optimization for taller screens like Pixel */
+        @media (min-height: 700px) and (max-width: 480px) {
+            .success-screen {
+                padding: 50px 30px;
             }
             
             .success-screen h1 {
                 font-size: 1.8em;
-            }
-            .success-screen .message {
-                font-size: 1em;
-            }
-            .emoji-big {
-                font-size: 3em;
-            }
-            .captcha-modal {
-                width: 95vw;
             }
         }
     </style>
@@ -727,7 +762,7 @@
 
             <div class="modal-footer">
                 <div class="icons">
-                    <span class="icon-refresh">↺</span>
+                    <span class="icon-refresh" id="refresh-btn">↺</span>
                     <span class="icon-audio">🎧</span>
                     <span class="icon-info">ⓘ</span>
                 </div>
@@ -776,7 +811,8 @@
         // CONFIGURATION
         // ======================
         const CONFIG = {
-            incorrectEmojis: ['🌟', '🌙', '⭐', '🔷', '🔶', '🎵', '💎', '🌸', '🍀'],
+            // Only non-heart emojis for incorrect tiles
+            incorrectEmojis: ['🌟', '🌙', '⭐', '🔷', '🔶', '🎵', '💎', '🌸', '🍀', '✨', '🦋', '🌺'],
             // Custom photos for correct tiles in round 2
             correctPhotos: [
                 'images/heart1.jpeg',
@@ -786,7 +822,7 @@
                 'images/heart5.jpeg'
             ],
             // Fallback to placeholder if photos not available
-            photoFallback: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%23ffe6f0" width="100" height="100"/%3E%3Ctext y="0.5em" x="50%25" text-anchor="middle" font-size="50" fill="%23ec4899"%3E❤️%3C/text%3E%3C/svg%3E'
+            photoFallback: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect fill="%23ffe6f0" width="100" height="100"/%3E%3Ctext y="0.5em" x="50%25" text-anchor="middle" font-size="50" fill="%23ec4899"%3E📷%3C/text%3E%3C/svg%3E'
         };
 
         const checkbox = document.getElementById('checkbox-btn');
@@ -794,6 +830,7 @@
         const captchaModal = document.getElementById('captcha-modal');
         const grid = document.getElementById('grid');
         const verifyBtn = document.getElementById('verify-btn');
+        const refreshBtn = document.getElementById('refresh-btn');
         const instructionText = document.getElementById('instruction-text');
 
         let currentRound = 0;
@@ -932,13 +969,13 @@
                 tile.className = 'grid-tile';
                 
                 if (isCorrect) {
-                    // CORRECT TILES: Use custom photos
+                    // CORRECT TILES: Use custom photos ONLY
                     const photoUrl = CONFIG.correctPhotos[Math.floor(Math.random() * CONFIG.correctPhotos.length)];
                     tile.style.backgroundImage = `url('${photoUrl}'), url('${CONFIG.photoFallback}')`;
                     tile.style.backgroundSize = 'cover';
                     tile.style.backgroundPosition = 'center';
                 } else {
-                    // INCORRECT TILES: Use emojis
+                    // INCORRECT TILES: Use ONLY non-heart emojis
                     const emoji = CONFIG.incorrectEmojis[Math.floor(Math.random() * CONFIG.incorrectEmojis.length)];
                     const gradient = 'linear-gradient(135deg, #f0f0f0 0%, #ffffff 100%)';
                     tile.innerHTML = `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 3em; background: ${gradient};">${emoji}</div>`;
@@ -952,6 +989,15 @@
                 gridData.push({ isCorrect });
             }
         }
+
+        // Refresh button functionality
+        refreshBtn.addEventListener('click', () => {
+            if (currentRound === 1) {
+                setupBoringGrid();
+            } else if (currentRound === 2) {
+                setupValentineGrid();
+            }
+        });
 
         function toggleTile(tile, index) {
             if (selectedTiles.has(index)) {
@@ -994,6 +1040,7 @@
                 if (allCorrect) {
                     showSuccess();
                 } else {
+                    // Wrong answer - refresh grid
                     setTimeout(() => {
                         setupValentineGrid();
                     }, 500);
